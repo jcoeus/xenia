@@ -1,0 +1,30 @@
+<html>
+    <style>
+    body{
+        font-size: 15pt;
+        font-family: arial;
+    }
+    </style>
+    <body>
+        <h1>SEAS Volunteers</h1>
+        <!----<div>{{data}}</div>-->
+
+        <div>
+            {% for n in data %}
+            <div>{{n}}</div>
+            {% endfor %}
+        </div>
+        <h2>Add New Student Volunteer</h2>
+        <form method="POST" action="/add">
+            <p>UNI: <input type="text" name="stu_id">
+            <p>Name: <input type="text" name="name">
+            <p>Graduation Year: <input type="text" name="year">
+            <p>Major: <input type="text" name="dep_id"></p>
+            <input type="submit" value="Add">
+        </form>
+        <h2>Remove Student</h2>
+        <form method="POST" action="/remove">
+            <p>UNI: <input type="text" name="stu_id"></p>
+        </form>
+    </body>
+</html>
