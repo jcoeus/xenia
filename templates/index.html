@@ -1,4 +1,8 @@
 <html>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Satisfy' rel='stylesheet' type='text/css'>
+</head>
     <style>
     body{
         font-size: 15pt;
@@ -6,14 +10,88 @@
     }
     </style>
     <body>
-        <h1>SEAS Volunteers</h1>
-        <!----<div>{{data}}</div>-->
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
 
-        <div>
-            {% for n in data %}
-            <div>{{n}}</div>
-            {% endfor %}
+                <!-- Header -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#topNavBar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">Some Project Name</a>
+                </div>
+
+                <!-- Items -->
+                <div class="collapse navbar-collapse" id="topNavBar">
+                    <form class="navbar-form navbar-left" role="search" method="get" action="/search">
+                        <div class="form-group">
+                            <input id= "query" type="text" class="form-control" name="query" placeholder="add search if needed">
+                        </div>
+                        <button id= "search_submit" type="submit" class="btn btn-default">Search</button>
+                    </form>
+                    <ul class="nav navbar-nav navbar-right">
+                        <!-- <li>
+                            <a href="/add">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp; Add New Student Volunteer
+                            </a>
+                        </li> -->
+
+                        <!-- need implementation -->
+                        {% if loggedIn == True %}
+                            <li>
+                                <a href="/logout/">
+                                    <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>&nbsp; Log out
+                                </a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a id="login" href="/login/">
+                                    <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>&nbsp; Log in
+                                </a>
+                            </li>
+                            <li>
+                                <a id="signup" href="/signup/">
+                                    <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>&nbsp; Sign up
+                                </a>
+                            </li>
+                        {% endif %}
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="jumbotron" style="background-image: url('https://cdn.wallpapersafari.com/92/12/XMCmYZ.jpg') !important; margin-bottom: 0px;">
+                <div class="container">
+                    <font color="saddlebrown">
+                        <h1>Welcome to Whatever</h1>
+                        <p>some description here</p>
+                    </font>
+                </div>
+            </div>
+        </nav>
+
+        <!-- List of volunteers -->
+        <div class="container">
+            <div class="row">
+                <div class="container">
+                    <h2 align="center">SEAS Volunteers<hr></h2>
+                </div>
+                {% if data %}
+                {% for n in data %}
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                    <h3>{{n}}</h3>
+                </div>
+                {% endfor %}
+                {% else %}
+                <strong>There are no volunteers.</strong>
+                {% endif %}
+            </div>
+            <hr>
         </div>
+
         <h2>Add New Student Volunteer</h2>
         <form method="POST" action="/add">
             <p>UNI: <input type="text" name="stu_id">
@@ -22,6 +100,7 @@
             <p>Major: <input type="text" name="dep_id"></p>
             <input type="submit" value="Add">
         </form>
+
         <h2>Remove Student</h2>
         <form method="POST" action="/remove">
             <p>UNI: <input type="text" name="stu_id"></p>

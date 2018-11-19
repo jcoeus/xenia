@@ -2,6 +2,7 @@ import os
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response
+from forms import *
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -58,10 +59,21 @@ def add():
   g.conn.execute(text(cmd),stu_id1 = stu_id,name1 = name, year1 = year, dep_id1 = dep_id);
   return redirect('/')
 
-@app.route('/login')
+@app.route('/signup/', methods=['GET', 'POST'])
+def signup():
+  form = SignUpForm(request.form)
+  if request.method == 'POST' and form.validate():
+      # add method to store new user
+      return redirect('/')
+  return render_template('signup.html', form=form)
+
+@app.route('/login/', methods=['GET', 'POST'])
 def login():
-  abort(401)
-  lol()
+  form = LogInForm(request.form)
+  if request.method == 'POST' and form.validate():
+    # add method to authenticate current user
+    return redirect('/')
+  return render_template('login.html', form=form)
 
 if __name__ == "__main__":
   import click
