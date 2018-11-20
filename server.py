@@ -5,7 +5,8 @@ from flask import Flask, request, render_template, g, redirect, Response
 from forms import *
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
-app = Flask(__name__, template_folder=tmpl_dir)
+stat_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+app = Flask(__name__, template_folder=tmpl_dir, static_folder=stat_dir)
 
 DB_USER = "jc4408"
 DB_PASSWORD = "y4h6k9g9"
@@ -44,6 +45,39 @@ def index():
 
   return render_template("index.html", **context)
 
+@app.route('/events')
+def events():
+  cursor = g.conn.execute("SELECT ev_id, ev_name, day_start, day_end FROM event")
+  events = []
+  for result in cursor:
+    temp = []
+    temp.append(result['ev_id'])
+    temp.append(result['ev_name'])
+    temp.append(result['day_start'])
+    temp.append(result['day_end'])
+    events.append(temp)
+  cursor.close()
+
+  context = dict(data = events)
+  
+  return render_template("events.html", **context)
+
+@app.route('/events/<ev_id>')
+def event_page(ev_id):
+  cursor = g.conn.execute("SELECT * FROM event WHERE ev_id = '"+ ev_id+"'")
+  res = []
+  for result in cursor:
+    res = result
+  cursor = g.conn.execute("SELECT grp_name FROM event e INNER JOIN hold h ON e.ev_id = h.ev_id INNER JOIN student_group sg ON h.grp_id = sg.grp_id WHERE e.ev_id='"+ev_id+"' ")
+  sg = []
+  for result in cursor:
+    sq.append(result['grp_name'])
+  cursor.close()
+  context = dict([('ev_id',res['ev_id']), ('ev_name', res['ev_name']),('day_start',res['day_start']),('day_end',res['day_end']),('general_act',res['general_act']),('specific_act',res['specific_act']),('photo',res['photo']),('notes',res['notes'])])
+  
+
+  return render_template("event_page.html", **context)
+
 @app.route('/another')
 def another():
   return render_template("anotherfile.html")
@@ -54,9 +88,9 @@ def add():
   name = request.form['name']
   year = request.form['year']
   dep_id = request.form['dep_id']
-  print stu_id, name
-  cmd = 'INSERT INTO seas_student VALUES (:stu_id1, :name1, :year1, :dep_id1)'; 
-  g.conn.execute(text(cmd),stu_id1 = stu_id,name1 = name, year1 = year, dep_id1 = dep_id);
+  print stu_id, name, year, dep_id
+  cmd = 'INSERT INTO seas_student VALUES (:stu_id1, :name1, :year1, :dep_id1)' 
+  g.conn.execute(text(cmd),stu_id1 = stu_id,name1 = name, year1 = year, dep_id1 = dep_id)
   return redirect('/')
 
 @app.route('/signup/', methods=['GET', 'POST'])
