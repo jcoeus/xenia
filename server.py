@@ -1,4 +1,4 @@
-import os
+import os, random, string
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response
@@ -21,7 +21,7 @@ def before_request():
     g.conn = engine.connect()
   except:
     print "Problem connecting to DB"
-    import traceback; traceback.print_exec()
+    import traceback; traceback.print_exc()
     g.conn = None
 
 @app.teardown_request
@@ -62,25 +62,72 @@ def events():
   
   return render_template("events.html", **context)
 
-@app.route('/events/<ev_id>')
+@app.route('/events/new')
+def new_ev():
+  ev_id = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+  cursor = g.conn.execute("SELECT ev_id FROM event WHERE ev_id ='"+ev_id+"'")
+  while(cursor.fetchone()):
+    ev_id = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+    cursor = g.conn.execute("SELECT ev_id FROM event WHERE ev_id ='"+ev_id+"'")
+  
+  cursor = g.conn.execute("SELECT grp_id, grp_name FROM student_group")
+  stu_grp = {}
+  for result in cursor:
+    stu_grp[result['grp_id']] = {'grp_name':result['grp_name']}
+  
+  cursor = g.conn.execute("SELECT sch_id, sch_name FROM partner_school")
+  par_sch = {}
+  for result in cursor:
+    par_sch[result['sch_id']] = {'sch_name':result['sch_name']}
+ 
+  context = dict([('stu_grp',stu_grp),('par_sch',par_sch)])
+
+  return render_template("event_form.html", **context)
+
+@app.route('/events/~<ev_id>')
 def event_page(ev_id):
   cursor = g.conn.execute("SELECT * FROM event WHERE ev_id = '"+ ev_id+"'")
-  res = []
-  for result in cursor:
-    res = result
+  res = cursor.fetchone()
+
+  #get student group names involved
   cursor = g.conn.execute("SELECT grp_name FROM event e INNER JOIN hold h ON e.ev_id = h.ev_id INNER JOIN student_group sg ON h.grp_id = sg.grp_id WHERE e.ev_id='"+ev_id+"' ")
   sg = []
   for result in cursor:
-    sq.append(result['grp_name'])
-  cursor.close()
-  context = dict([('ev_id',res['ev_id']), ('ev_name', res['ev_name']),('day_start',res['day_start']),('day_end',res['day_end']),('general_act',res['general_act']),('specific_act',res['specific_act']),('photo',res['photo']),('notes',res['notes'])])
-  
+    sg.append(result['grp_name'])
 
+  #get partner school names involved
+  cursor = g.conn.execute("SELECT sch_name FROM event e INNER JOIN partner p ON e.ev_id = p.ev_id INNER JOIN partner_school ps ON p.sch_id = ps.sch_id WHERE e.ev_id='"+ev_id+"' ")
+  ps = []
+  for result in cursor:
+    ps.append(result['sch_name'])
+
+  #get keywords/topics about event
+  cursor = g.conn.execute("SELECT top_name FROM event e INNER JOIN cover c ON e.ev_id = c.ev_id INNER JOIN keyword k ON c.top_id = k.top_id WHERE e.ev_id='"+ev_id+"' ")
+  kt = []
+  for result in cursor:
+    kt.append(result['top_name'])
+
+  #get faculty involved
+  cursor = g.conn.execute("SELECT fac_name FROM event e INNER JOIN attend a ON e.ev_id = a.ev_id INNER JOIN faculty f ON a.fac_id = f.fac_id WHERE e.ev_id='"+ev_id+"' ")
+  ft = []
+  for result in cursor:
+    ft.append(result['fac_name'])
+
+  #get admin involved
+
+
+  cursor.close()
+  context = dict([('fac_name',ft),('key_name',kt),('sch_name',ps),('ev_type',res['ev_type'],),('time_per_session',res['time_per_session'],),('total_time',res['total_time']),('general_act', res['general_act']),('term',res['term']),('ev_id',res['ev_id']), ('ev_name', res['ev_name']),('day_start',res['day_start']),('day_end',res['day_end']),('specific_act',res['specific_act']),('photo',res['photo']),('notes',res['notes']), ('group_names', sg)])
+  
   return render_template("event_page.html", **context)
 
-@app.route('/another')
-def another():
-  return render_template("anotherfile.html")
+@app.route('/events/<ev_id>/edit')
+def edit(ev_id):
+  return redirect('/events/'+ev_id)
+
+@app.route('/events/<ev_id>/delete_ev')
+def delete_ev(ev_id):
+  return redirect('/events/')
 
 @app.route('/add', methods=['POST'])
 def add():
@@ -108,6 +155,11 @@ def login():
     # add method to authenticate current user
     return redirect('/')
   return render_template('login.html', form=form)
+'''
+@app.errorhandler(404)
+def page_not_found(e):
+  return render_template('404.html'), 404
+'''
 
 if __name__ == "__main__":
   import click

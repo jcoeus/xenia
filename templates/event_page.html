@@ -7,33 +7,122 @@
             <header class="blog-header py-3">
                 <div class="row flex-nowrap justify-content-between align-items-center">
                         <div class="col-12 text-center">
-                            <a class="blog-header-logo text-dark" >{{ev_id}} : {{ev_name}}</a>
+                            <h2 class="blog-header-logo text-dark">
+                                <button type="button" class="btn btn-light btn-sm float-left">Edit</button>
+                                {{ev_id}} : {{ev_name}}
+                                <button type="button" class="btn btn-light btn-sm float-right">Delete</button>
+                                <hr>
+                            </h2>
+                            
                         </div>
+                        
                 </div>
             </header>
             <main role="main" class="container">
                 <div class="row">
                     <div class="col-md-8 blog-main">
                         <div class="blog-post">
-                            <p class="blog-post-meta"> Date: 
+                            <p class="blog-post-meta"> 
+                            
+                                {% if term %}
+                                Term:
+                                {{ term }}, 
+                                {% else %}
+                                {{day_start}} : {{day_end}}
+                                {% endif %}
+                                Date: 
                                 {% if day_start == day_end %}
                                 {{day_start}}
                                 {% else %}
-                                {{day_start}} : {{day_end}}
+                                ({{day_start}}, {{day_end}})
                                 {% endif %}
                             </p>
                             <hr>
                             <p>
-                                {% if %}
-                                {}
-                                {}
+                                {% if group_names %}
+                                <p><b>Student Groups:</b></p>
+                                {% for n in group_names %}
+                                    <li>{{n}}</li>
+                                {% endfor %}
+                                {% else %}
+                                <p><b>There are no student groups </b></p>
                                 {% endif %}
+                            </p>
+                                
+                            <hr>
+                            <p>
+                                    {% if sch_name %}
+                                    <p><b>Partner Institutions:</b></p>
+                                    {% for n in sch_name %}
+                                        <li>{{n}}</li>
+                                    {% endfor %}
+                                    {% else %}
+                                    <p><b>There are no partner institutions</b></p>
+                                    {% endif %}
+                                </p>
+                            <hr>
+                            <p>
+                                    {% if fac_name %}
+                                    <p><b>Faculty Attending:</b></p>
+                                    {% for n in fac_name %}
+                                        <li>{{n}}</li>
+                                    {% endfor %}
+                                    {% else %}
+                                    <p><b>There are no faculty attending</b></p>
+                                    {% endif %}
+                                </p>
+                            <hr>
+                            <p>
+                                    {% if key_name %}
+                                    <p><b>Keywords:</b></p>
+                                    {% for n in key_name %}
+                                        <li>{{n}}</li>
+                                    {% endfor %}
+                                    {% else %}
+                                    <p><b>There are no keywords</b></p>
+                                    {% endif %}
+                                </p>
+                            <hr>
+                            <p>
+    
+                                {% if notes %}
+                                <p><b>Notes:</b></p>
+                                <p>{{ notes }}</p>
+                                {% else %}
+                                <p><b>There are no notes</b></p>
+                                {% endif %}
+                            </p>
+                            <hr>
+                            <p>
+
                             </p>
                         </div>
                     </div>
                     <aside class="col-md-4 blog-sidebar">
                         <div class="p-3 mb-3 bg-light rounded">
-
+                            {% if ev_type %}
+                            <p><b>Event Type:</b></p>
+                            <p>{{ ev_type }}</p>
+                            {% endif %}
+                            {% if general_act %}
+                            <p><b>General Activity:</b></p>
+                            <p>{{ general_act }}</p>
+                            {% endif %}
+                            {% if specific_act %}
+                            <p><b>Specific Activity:</b></p>
+                            <p>{{ specific_act }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="p-3">
+                            <p class="font-bold">Sessions</p>
+                            <p class="font-italic">Time per Session:</p>
+                            {% if time_per_session %}
+                            <p>{{ time_per_session }} hr</p>
+                            {% endif %}
+                            <p class="font-italic">Total Time:</p>
+                            {% if total_time %}
+                            <p>{{ total_time }} hr</p>
+                            {% endif %}
                         </div>
 
                     </aside>
