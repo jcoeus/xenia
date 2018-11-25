@@ -1,0 +1,138 @@
+<html>
+        <head>
+                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
+            </head>
+            <body>
+                <div class="container">
+                    <header class="blog-header py-3">
+                        <div class="row flex-nowrap justify-content-between align-items-center">
+                                <div class="col-12 text-center">
+                                    <h2 class="blog-header-logo text-dark">
+                
+                                        Event Page for EID: {{ev_id}}  
+                                        <button type="button" class="btn btn-light btn-sm float-right">Delete</button>
+                                        <hr>
+                                    </h2>
+                                    
+                                </div>
+                                
+                        </div>
+                    </header>
+                    <main role="main" class="container">
+                        <div class="container">
+                        <div class="row">
+                            <div class="col-md-8">
+                        <form method="POST" action="/events/~{{ev_id}}/add">
+                            <div class="form-group">
+                                <label for="ev_name">Event Name:</label>
+                                <input class="form-control" name="ev_name">
+                            </div>
+                            <hr>
+                            <div class="form-group">
+                                <label for="ev_des">Event Description:</label>
+                                <textarea class="form-control" rows="3" name="ev_des"></textarea>
+                            </div>
+                            <hr>            
+                            <div class="form-group">
+                                <label for="stu_grp">Student Group Involved:</label>
+                                <select multiple class="form-control" name="grp_id">
+                                    {% if stu_grp %}
+                                    {% for n in stu_grp %}
+                                    <option>{{n}} | {{stu_grp[n]['grp_name']}}</option>
+                                    {% endfor %}
+                                    {% endif %}
+                            
+                                </select>
+                            </div>
+                            <hr>
+                            <div class="form-group">
+                                <label for ="fac_name">Faculty Attending:</label>
+                                <select multiple class="form-control" name="fac_id">
+                                    {% if fac_att %}
+                                    {% for n in fac_att %}
+                                    <option>{{n}} | {{fac_att[n]['fac_name']}}</option>
+                                    {% endfor %}
+                                    {% endif %}
+                                </select>
+                            </div>
+                            <hr>
+                            <div class="form-group">
+                                <label for ="fac_name">Partner Institutions:</label>
+                                <select multiple class="form-control" name="sch_id">
+                                    {% if pat_ins %}
+                                    {% for n in pat_ins %}
+                                    <option>{{n}} | {{pat_ins[n]['sch_name']}}</option>
+                                    {% endfor %}
+                                    {% endif %}
+                                </select>
+                            </div>
+                            <hr>
+                            <div class="form-group">
+                                <label for ="top_key">Keywords (Please start every keywords with a #):</label>
+                                <textarea class="form-control" rows="3" name="keywords">
+                                
+                                </textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <aside class="col-md-4 blog-sidebar">
+                            <div class="p-2 mb-2 bg-light rounded">
+                                    <div class="form-group">
+                                            <label for="day_start">Start Date:</label>
+                                            <input type="date" class="form-control" name="day_start">
+                                        </div><hr>
+                                        <div class="form-group">
+                                            <label for="day_end">End Date:</label>
+                                            <input type="date" class="form-control" name="day_end">
+                                        </div>
+                            </div>
+                            <div class="p-2">
+                                <div class="form-group">
+                                    <label for="tim_ses">Time per Session:</label>
+                                    <input class="form-control" name="time_per_session">
+                                </div>
+                                <hr>
+                                <div>
+                                        <label for="tot_tim">Total Time:</label>
+                                        <input class="form-control" name="total_time">
+                                </div>
+                                
+                            </div>
+                            <div class="p-2 mb-2 bg-light rounded">
+                                    <div class="form-group">
+                                            <label for="general_act">General Activity</label>
+                                            <select class="form-control" name="general_act">
+                                                <option></option>
+                                            </select>
+                                        </div><hr>
+                                        <div class="form-group">
+                                            <label for="specific_act">Specific Activity:</label>
+                                            <select class="form-control" name="specific_act">
+                                                <option></option>
+                                            </select>
+                                        </div>
+                            </div>
+    
+                        </aside>
+                    </div>
+                    </main>
+                </div>
+            
+                    
+                </div>
+                <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+                <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/bootstrap-select.min.js"></script>
+                <script>
+                    jQuery(document).ready(function($) {
+                        $(".click-row").click(function() {
+                            window.location = $(this).data("href");
+                        });
+                    });
+
+                </script>
+            </body>
+        
+</html>

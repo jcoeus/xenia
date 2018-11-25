@@ -69,6 +69,8 @@ def new_ev():
   while(cursor.fetchone()):
     ev_id = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
     cursor = g.conn.execute("SELECT ev_id FROM event WHERE ev_id ='"+ev_id+"'")
+
+  # need to "reserve" the unique ID for the time being, might just add blank values
   
   cursor = g.conn.execute("SELECT grp_id, grp_name FROM student_group")
   stu_grp = {}
@@ -79,8 +81,23 @@ def new_ev():
   par_sch = {}
   for result in cursor:
     par_sch[result['sch_id']] = {'sch_name':result['sch_name']}
+
+  cursor = g.conn.execute("SELECT fac_id, fac_name FROM faculty")
+  fac_att = {}
+  for result in cursor:
+    fac_att[result['fac_id']] = {'fac_name':result['fac_name']}
+
+  cursor = g.conn.execute("SELECT * FROM partner_school")
+  pat_ins = {}
+  for result in cursor:
+    pat_ins[result['sch_id']] = {'sch_name':result['sch_name']}
+
+  cursor = g.conn.execute("SELECT * FROM keyword")
+  top_key = {}
+  for result in cursor:
+    top_key[result['top_id']] = {'top_name':result['top_name']}
  
-  context = dict([('stu_grp',stu_grp),('par_sch',par_sch)])
+  context = dict([('top_key',top_key),('pat_ins',pat_ins),('fac_att',fac_att),('ev_id', ev_id),('stu_grp',stu_grp),('par_sch',par_sch)])
 
   return render_template("event_form.html", **context)
 
@@ -121,12 +138,50 @@ def event_page(ev_id):
   
   return render_template("event_page.html", **context)
 
-@app.route('/events/<ev_id>/edit')
-def edit(ev_id):
-  return redirect('/events/'+ev_id)
+@app.route('/events/~<ev_id>/add', methods=['POST'])
+def add_event(ev_id):
 
-@app.route('/events/<ev_id>/delete_ev')
+  day_start = request.form['day_start']
+  day_end = request.form['day_end']
+  general_act = request.form['general_act']
+  specific_act = request.form['specific_act']
+  photo = request.form['photo']
+  total_time = request.form['total_time']
+  time_per_session = request.form['time_per_session']
+  notes = request.form['notes']
+  term = request.form['term']
+  ev_name = request.form['ev_name']
+  ev_type = request.form['ev_type']
+  ev_des = request.form['ev_des']
+  
+  grp_id = request.form['grp_id']
+  top_id = request.form['top_id']
+  fac_id = request.form['fac_id']
+  sch_id = request.form['sch_id']
+
+
+  insert_event = 'INSERT INTO event VALUES (:ev_id1, :day_start1, :day_end1, :general_act1, :specific_act1, :photo1, :total_time1, :time_per_session1, :notes1, :term1, :ev_name1, :ev_type1, :ev_des1)' 
+  insert_cover = 'INSERT INTO cover VALUES (:ev_id1,:top_id1)'
+  insert_attend = 'INSERT INTO attend VALUES (:ev_id1,:fac_id1)'
+  insert_partner = 'INSERT INTO partner VALUES (:ev_id1,;sch_id1)'
+  insert_hold = 'INSERT INTO hold VALUES (:ev_id1, :grp_id1)'
+
+  g.conn.execute(text(insert_event),ev_id1 = ev_id, day_start1 = day_start, day_end1 = day_end, general_act1 = general_act, specific_act1 = specific_act, photo1 = photo, total_time1 = total_time, time_per_session1 = time_per_session, notes1 = notes, term1 = term, ev_name1 =ev_name, ev_type1 = ev_type, ev_des1 = ev_des)
+  g.conn.execute(text(insert_cover),ev_id1 = ev_id, top_id1 = top_id)
+  g.conn.execute(text(insert_attend),ev_id1 = ev_id, fac_id1 = fac_id)
+  g.conn.execute(text(insert_partner),ev_id1 = ev_id, sch_id1 = sch_id)
+  g.conn.execute(text(insert_hold),ev_id1 = ev_id, grp_id1 = grp_id)
+
+  return redirect('/events/~<ev_id>')
+
+@app.route('/events/~<ev_id>/edit')
+def edit(ev_id):
+  
+  return redirect('/events/~'+ev_id)
+
+@app.route('/events/~<ev_id>/delete_ev')
 def delete_ev(ev_id):
+  g.conn.execute("DELETE FROM event WHERE ev_id = '"+ev_id+"'")
   return redirect('/events/')
 
 @app.route('/add', methods=['POST'])
