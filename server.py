@@ -140,6 +140,7 @@ def event_page(ev_id):
 
 @app.route('/events/~<ev_id>/add', methods=['POST'])
 def add_event(ev_id):
+  print 'Im warking hereee'
 
   day_start = request.form['day_start']
   day_end = request.form['day_end']
@@ -147,42 +148,62 @@ def add_event(ev_id):
   specific_act = request.form['specific_act']
   photo = request.form['photo']
   total_time = request.form['total_time']
+  print total_time
   time_per_session = request.form['time_per_session']
+  print time_per_session
   notes = request.form['notes']
+  print notes
   term = request.form['term']
+  print term
   ev_name = request.form['ev_name']
+  print ev_name
   ev_type = request.form['ev_type']
+  print ev_type
   ev_des = request.form['ev_des']
+  print ev_des
   
-  grp_id = request.form['grp_id']
-  top_id = request.form['top_id']
-  fac_id = request.form['fac_id']
-  sch_id = request.form['sch_id']
+  grp_id = request.form.getlist('grp_id')
+  print grp_id
+  top_id = request.form.getlist('top_id')
+  print top_id
+  fac_id = request.form.getlist('fac_id')
+  print fac_id
+  sch_id = request.form.getlist('sch_id')
+  print sch_id
 
+  print 'you made it pass the get form value requests'
 
   insert_event = 'INSERT INTO event VALUES (:ev_id1, :day_start1, :day_end1, :general_act1, :specific_act1, :photo1, :total_time1, :time_per_session1, :notes1, :term1, :ev_name1, :ev_type1, :ev_des1)' 
   insert_cover = 'INSERT INTO cover VALUES (:ev_id1,:top_id1)'
   insert_attend = 'INSERT INTO attend VALUES (:ev_id1,:fac_id1)'
-  insert_partner = 'INSERT INTO partner VALUES (:ev_id1,;sch_id1)'
-  insert_hold = 'INSERT INTO hold VALUES (:ev_id1, :grp_id1)'
+  insert_partner = 'INSERT INTO partner VALUES (:ev_id1,:sch_id1)'
+  insert_hold = 'INSERT INTO hold VALUES (:grp_id1, :ev_id1)'
 
   g.conn.execute(text(insert_event),ev_id1 = ev_id, day_start1 = day_start, day_end1 = day_end, general_act1 = general_act, specific_act1 = specific_act, photo1 = photo, total_time1 = total_time, time_per_session1 = time_per_session, notes1 = notes, term1 = term, ev_name1 =ev_name, ev_type1 = ev_type, ev_des1 = ev_des)
-  g.conn.execute(text(insert_cover),ev_id1 = ev_id, top_id1 = top_id)
-  g.conn.execute(text(insert_attend),ev_id1 = ev_id, fac_id1 = fac_id)
-  g.conn.execute(text(insert_partner),ev_id1 = ev_id, sch_id1 = sch_id)
-  g.conn.execute(text(insert_hold),ev_id1 = ev_id, grp_id1 = grp_id)
-
-  return redirect('/events/~<ev_id>')
+  for n in grp_id:
+    g.conn.execute(text(insert_hold),ev_id1 = ev_id, grp_id1 = n)
+  for n in top_id:
+    g.conn.execute(text(insert_cover),ev_id1 = ev_id, top_id1 = n)
+  for n in fac_id:
+    g.conn.execute(text(insert_attend),ev_id1 = ev_id, fac_id1 = n)
+  for n in sch_id:
+    g.conn.execute(text(insert_partner),ev_id1 = ev_id, sch_id1 = n)
+  
+  return redirect('/events/~'+ev_id)
 
 @app.route('/events/~<ev_id>/edit')
 def edit(ev_id):
-  
+
   return redirect('/events/~'+ev_id)
 
 @app.route('/events/~<ev_id>/delete_ev')
 def delete_ev(ev_id):
-  g.conn.execute("DELETE FROM event WHERE ev_id = '"+ev_id+"'")
-  return redirect('/events/')
+  g.conn.execute("DELETE FROM hold WHERE ev_id = '"+ev_id+"'")
+  g.conn.execute("DELETE FROM cover WHERE ev_id ='"+ev_id+"'")
+  g.conn.execute("DELETE FROM partner WHERE ev_id ='"+ev_id+"'")
+  g.conn.execute("DELETE FROM attend WHERE ev_id ='"+ev_id+"'")
+  g.conn.execute("DELETE FROM event WHERE ev_id ='"+ev_id+"'")
+  return redirect('/events')
 
 @app.route('/add', methods=['POST'])
 def add():
