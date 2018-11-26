@@ -45,6 +45,21 @@ def index():
 
   return render_template("index.html", **context)
 
+@app.route('/student_groups')
+def student_groups():
+  cursor = g.conn.execute("SELECT grp_id, grp_name FROM student_group")
+  student_groups = []
+  for result in cursor:
+    temp = []
+    temp.append(result['grp_id'])
+    temp.append(result['grp_name'])
+    student_groups.append(temp)
+  cursor.close()
+
+  context = dict(data = student_groups)
+  
+  return render_template("student_groups.html", **context)
+
 @app.route('/events')
 def events():
   cursor = g.conn.execute("SELECT ev_id, ev_name, day_start, day_end FROM event")

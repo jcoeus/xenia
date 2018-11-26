@@ -2,3 +2,16 @@ body {
     background-color: rgb(108,172,228);
     color: rgb(2,33,105);
 }
+
+.home-logo {
+	background-image: url('https://outreach.engineering.columbia.edu/sites/default/files/logo/outreach-programs.jpg') !important; 
+	margin-bottom: 0px; 
+	padding-top: 6%; 
+	background-position: 5% 0%; 
+	background-color: white; 
+	background-repeat: no-repeat;
+}
+
+.home-options {
+	padding-top: 100px;
+}

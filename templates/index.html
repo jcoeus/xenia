@@ -15,7 +15,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="/">Some Project Name</a>
+                    <a class="navbar-brand" href="/">XENIA</a>
                 </div>
 
                 <!-- Items -->
@@ -48,7 +48,7 @@
                             </li>
                             <li>
                                 <a id="signup" href="/signup/">
-                                    <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>&nbsp; Sign up
+                                    <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>&nbsp; Student Group Register
                                 </a>
                             </li>
                         {% endif %}
@@ -58,19 +58,12 @@
 
             </div>
 
-            <div class="jumbotron" style="background-image: url('https://outreach.engineering.columbia.edu/sites/default/files/logo/outreach-programs.jpg') !important; margin-bottom: 0px;">
-                <!--<div class="container">-->
-                    <!--<font color="saddlebrown">-->
-                        <!--<h1>Welcome to Whatever</h1>-->
-                        <!--<p>some description here</p>-->
-                    <!--</font>-->
-                <!--</div>-->
-            </div>
+            <div class="jumbotron home-logo"></div>
         </nav>
 
         <!-- List of volunteers -->
         <div class="container">
-            <div class="row">
+            <!-- <div class="row">
                 <div class="container">
                     <h2 align="center">SEAS Volunteers<hr></h2>
                 </div>
@@ -84,10 +77,21 @@
                 <strong>There are no volunteers.</strong>
                 {% endif %}
             </div>
-            <hr>
+            <hr> -->
+            <div class="row home-options">
+                <div class="col-md-4">
+                    <a href="/events/new" type="button" class="btn btn-primary btn-lg btn-block">Add New Event</a>
+                </div>
+                <div class="col-md-4">
+                    <a href="/events" type="button" class="btn btn-primary btn-lg btn-block">View Past Events</a>
+                </div>
+                <div class="col-md-4">
+                    <a href="/student_groups" type="button" class="btn btn-primary btn-lg btn-block">View Student Groups</a>
+                </div>
+            </div>
         </div>
 
-        <h2>Add New Student Volunteer</h2>
+        <!-- <h2>Add New Student Volunteer</h2>
         <form method="POST" action="/add">
             <p>UNI: <input type="text" name="stu_id">
             <p>Name: <input type="text" name="name">
@@ -99,6 +103,6 @@
         <h2>Remove Student</h2>
         <form method="POST" action="/remove">
             <p>UNI: <input type="text" name="stu_id"></p>
-        </form>
+        </form> -->
     </body>
 </html>
