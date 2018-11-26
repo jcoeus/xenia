@@ -28,12 +28,12 @@
                         
                             <div class="form-group">
                                 <label for="ev_name">Event Name:</label>
-                                <input class="form-control" name="ev_name">
+                                <input class="form-control" name="ev_name" {% if ev_name %} value = "{{ev_name}}" {% endif %}>
                             </div>
                             <hr>
                             <div class="form-group">
                                 <label for="ev_des">Event Description:</label>
-                                <textarea class="form-control" rows="3" name="ev_des"></textarea>
+                                <textarea class="form-control" rows="3" name="ev_des">{% if ev_des %}{{ev_des}}{% endif %}</textarea>
                             </div>
                             <hr>            
                             <div class="form-group">
@@ -41,7 +41,7 @@
                                 <select multiple class="form-control" name="grp_id">
                                     {% if stu_grp %}
                                     {% for n in stu_grp %}
-                                    <option value = "{{n}}">{{n}} | {{stu_grp[n]['grp_name']}}</option>
+                                    <option value = "{{n}}" {% if stu_grp[n]['grp_name'] in group_names %} selected {% endif %}>{{n}} | {{stu_grp[n]['grp_name']}}</option>
                                     {% endfor %}
                                     {% endif %}
                             
@@ -53,7 +53,7 @@
                                 <select multiple class="form-control" name="fac_id">
                                     {% if fac_att %}
                                     {% for n in fac_att %}
-                                    <option value = "{{n}}">{{n}} | {{fac_att[n]['fac_name']}}</option>
+                                    <option value = "{{n}}" {% if fac_att[n]['fac_name'] in fac_name %} selected {% endif %}>{{n}} | {{fac_att[n]['fac_name']}}</option>
                                     {% endfor %}
                                     {% endif %}
                                 </select>
@@ -64,7 +64,7 @@
                                 <select multiple class="form-control" name="sch_id">
                                     {% if pat_ins %}
                                     {% for n in pat_ins %}
-                                    <option value = "{{n}}">{{n}} | {{pat_ins[n]['sch_name']}}</option>
+                                    <option value = "{{n}}" {% if pat_ins[n]['sch_name'] in sch_name %} selected {% endif %}>{{n}} | {{pat_ins[n]['sch_name']}}</option>
                                     {% endfor %}
                                     {% endif %}
                                 </select>
@@ -72,7 +72,7 @@
                             <hr>
                             <div class="form-group">
                                 <label for ="top_id">Keywords (Please start every keywords with a #):</label>
-                                <textarea class="form-control" rows="3" name="top_id"></textarea>
+                                <textarea class="form-control" rows="3" name="top_id">{% if key_name %}{%for n in key_name%}#{{n}} {% endfor %}{% endif %}</textarea>
                             </div>
                             <div class="form-group">
                                 <label for ="photo"> Photos: </label>
@@ -93,22 +93,22 @@
                                 <hr>
                                     <div class="form-group">
                                             <label for="day_start">Start Date:</label>
-                                            <input type="date" class="form-control" name="day_start">
+                                            <input type="date" class="form-control" name="day_start" {% if day_start %} value="{{day_start}}" {% endif %}>
                                         </div><hr>
                                         <div class="form-group">
                                             <label for="day_end">End Date:</label>
-                                            <input type="date" class="form-control" name="day_end">
+                                            <input type="date" class="form-control" name="day_end" {% if day_end %} value="{{day_end}}" {% endif %}>
                                         </div>
                             </div>
                             <div class="p-2">
                                 <div class="form-group">
-                                    <label for="time_per_session">Time per Session:</label>
-                                    <input class="form-control" name="time_per_session">
+                                    <label for="time_per_session">Time per Session (hr):</label>
+                                    <input class="form-control" name="time_per_session" {% if time_per_session %} value="{{time_per_session}}" {% endif %}>
                                 </div>
                                 <hr>
                                 <div>
-                                        <label for="total_time">Total Time:</label>
-                                        <input class="form-control" name="total_time">
+                                        <label for="total_time">Total Time (hr):</label>
+                                        <input class="form-control" name="total_time" {% if total_time %} value="{{total_time}}" {% endif %} >
                                 </div>
                                 
                             </div>

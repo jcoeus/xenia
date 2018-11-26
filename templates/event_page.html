@@ -8,9 +8,9 @@
                 <div class="row flex-nowrap justify-content-between align-items-center">
                         <div class="col-12 text-center">
                             <h2 class="blog-header-logo text-dark">
-                                <button type="button" class="btn btn-light btn-sm float-left">Edit</button>
+                                <button type="button" class="btn btn-light btn-sm float-left click-red" data-href="/events/~{{ev_id}}/edit_ev">Edit</button>
                                 {{ev_id}} : {{ev_name}}
-                                <button type="button" class="btn btn-light btn-sm float-right click-del" data-href="/events/~{{ev_id}}/delete_ev">Delete</button>
+                                <button type="button" class="btn btn-light btn-sm float-right click-red" data-href="/events/~{{ev_id}}/delete_ev">Delete</button>
                                 <hr>
                             </h2>
                             
@@ -37,6 +37,16 @@
                                 ({{day_start}}, {{day_end}})
                                 {% endif %}
                             </p>
+                            <hr>
+                            <p>
+                                {% if ev_des %}
+                                <p><b>Event Description:</b></p>
+                                <p>{{ev_des}}</p>
+                                {% else %}
+                                <p><b>There is no event description </b></p>
+                                {% endif %}
+                            </p>
+                                
                             <hr>
                             <p>
                                 {% if group_names %}
@@ -137,7 +147,7 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <script>
             jQuery(document).ready(function($) {
-                $(".click-del").click(function() {
+                $(".click-red").click(function() {
                     window.location = $(this).data("href");
                 });
             });
