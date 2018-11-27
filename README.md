@@ -1,2 +1,2 @@
 # xenia
-Columbia Engineering Outreach Program Database Project
+Columbia Engineering Outreach Programs Database Project
