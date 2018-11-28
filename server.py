@@ -1,12 +1,15 @@
 import os, random, string
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, request, render_template, g, redirect, Response
+from flask import Flask, request, render_template, g, redirect, Response, session
+from flask_hashing import Hashing
 from forms import *
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 stat_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 app = Flask(__name__, template_folder=tmpl_dir, static_folder=stat_dir)
+app.secret_key = b'\xef\x9d\x89Q\xa3\x0b4nAY\x13\xccg\x83&\xfc'
+hashing = Hashing(app)
 
 DB_USER = "jc4408"
 DB_PASSWORD = "y4h6k9g9"
@@ -14,6 +17,8 @@ DB_SERVER = "w4111.cisxo09blonu.us-east-1.rds.amazonaws.com"
 DATABASEURI = "postgresql://"+DB_USER+":"+DB_PASSWORD+"@"+DB_SERVER+"/w4111"
 
 engine = create_engine(DATABASEURI)
+
+my_salt = 'jcnyw4111'
 
 def key_par(s):
   return s.split('#')[1:]
@@ -40,30 +45,22 @@ def teardown_request(execption):
 
 @app.route('/')
 def index():
-  print request.args
-
-  cursor = g.conn.execute("SELECT stu_name FROM seas_student")
-  names = []
-  for result in cursor:
-    names.append(result['stu_name'])
-  cursor.close()
-
-  context = dict(data = names)
-
+  context = dict(loggedIn=session)
   return render_template("index.html", **context)
 
 @app.route('/student_groups')
 def student_groups():
-  cursor = g.conn.execute("SELECT grp_id, grp_name FROM student_group")
+  cursor = g.conn.execute("SELECT grp_id, grp_name, email FROM student_group")
   student_groups = []
   for result in cursor:
     temp = []
     temp.append(result['grp_id'])
     temp.append(result['grp_name'])
+    temp.append(result['email'])
     student_groups.append(temp)
   cursor.close()
 
-  context = dict(data = student_groups)
+  context = dict(data = student_groups, loggedIn=session)
   
   return render_template("student_groups.html", **context)
 
@@ -80,7 +77,7 @@ def events():
     events.append(temp)
   cursor.close()
 
-  context = dict(data = events)
+  context = dict(data = events, loggedIn=session)
   
   return render_template("events.html", **context)
 
@@ -120,6 +117,7 @@ def new_ev():
     top_key[result['top_id']] = {'top_name':result['top_name']}
  
   context = dict([('top_key',top_key),('pat_ins',pat_ins),('fac_att',fac_att),('ev_id', ev_id),('stu_grp',stu_grp),('par_sch',par_sch)])
+  context['loggedIn'] = session
 
   return render_template("event_form.html", **context)
 
@@ -157,7 +155,8 @@ def event_page(ev_id):
 
   cursor.close()
   context = dict([('fac_name',ft),('key_name',kt),('sch_name',ps),('ev_type',res['ev_type'],),('time_per_session',res['time_per_session'],),('total_time',res['total_time']),('general_act', res['general_act']),('term',res['term']),('ev_id',res['ev_id']), ('ev_name', res['ev_name']),('ev_des', res['ev_des']),('day_start',res['day_start']),('day_end',res['day_end']),('specific_act',res['specific_act']),('photo',res['photo']),('notes',res['notes']), ('group_names', sg)])
-  
+  context['loggedIn'] = session
+
   return render_template("event_page.html", **context)
 
 @app.route('/events/~<ev_id>/add', methods=['POST'])
@@ -298,7 +297,7 @@ def edit_ev(ev_id):
 
   context = context_prev.copy()
   context.update(context_poss)
-
+  context['loggedIn']=session
 
   return render_template("event_form.html", **context)
 
@@ -327,17 +326,42 @@ def add():
 def signup():
   form = SignUpForm(request.form)
   if request.method == 'POST' and form.validate():
-      # add method to store new user
-      return redirect('/')
-  return render_template('signup.html', form=form)
+      student_group_id = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+      student_group_name = form.student_group_name.data
+      email = form.email.data
+      password = hashing.hash_value(form.password.data, salt=my_salt)
+      cmd = 'INSERT INTO student_group VALUES (:grp_id1, :grp_name1, :password1, :email1)'
+      g.conn.execute(text(cmd), grp_id1=student_group_id, grp_name1=student_group_name, password1=password, email1=email)
+      return redirect('/login/')
+  context = dict(form=form, loggedIn=session)
+  return render_template('signup.html', **context)
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
   form = LogInForm(request.form)
-  if request.method == 'POST' and form.validate():
-    # add method to authenticate current user
-    return redirect('/')
-  return render_template('login.html', form=form)
+  if request.method == 'POST':
+    email = form.email.data
+    password = form.password.data
+    cmd = 'SELECT * FROM student_group WHERE email = :email1'
+    cursor = g.conn.execute(text(cmd), email1=email)
+    res = cursor.fetchone()
+    isValid = True if res and hashing.check_value(res.password, password, salt=my_salt) else False
+    if form.validate(res, isValid):
+      session['stu_grp'] = dict(grp_id=res.grp_id, grp_name=res.grp_name, email=email)
+      return redirect('/')
+  context = dict(form=form, loggedIn=session)
+  return render_template('login.html', **context)
+
+@app.route('/logout/')
+def logout():
+  session.pop('stu_grp', None)
+  return redirect('/')
+
+@app.route('/profile/~<id>/')
+def profile(id):
+  context = dict(grp_name=session['stu_grp']['grp_name'], email=session['stu_grp']['email'])
+  return render_template('profile.html', **context)
+
 '''
 @app.errorhandler(404)
 def page_not_found(e):

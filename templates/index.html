@@ -4,34 +4,42 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css')}}" type="text/css">
     <link href='https://fonts.googleapis.com/css?family=Satisfy' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </head>
     <body>
         <nav class="navbar navbar-expand-md bg-dark navbar-dark">
-
-            <a class="navbar-brand" href="/">XENIA</a>
+            <a class="navbar-brand ml-2" href="/">XENIA</a>
             <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#topNavBar">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <!-- Items -->
             <div class="collapse navbar-collapse" id="topNavBar">
-                <form class="form-inline" role="search" method="get" action="/search">
+                <form class="form-inline m-0" role="search" method="get" action="/search">
                     <input id= "query" type="text" class="form-control mr-sm-2" name="query" placeholder="add search if needed">
                     <button id= "search_submit" type="submit" class="btn btn-secondary">Search</button>
                 </form>
                 <ul class="nav navbar-nav ml-auto">
                 
                     <!-- need implementation -->
-                    {% if loggedIn == True %}
+                    {% if loggedIn %}
                         <li class="nav-item">
                             <a class="nav-link" href= ""></a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/logout/">
-                                <i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp; Log out
+                        <li class="nav-item dropdown mr-2">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-user-circle" aria-hidden="true"></i>&nbsp; {{loggedIn.stu_grp.grp_name}}
                             </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="/profile/~{{loggedIn.stu_grp.grp_id}}/">Profile</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" id="logout" href="/logout/">
+                                    <i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp; Log out
+                                </a>
+                            </div>
                         </li>
-                        
                     {% else %}
                         <li class="nav-item mr-sm-2">
                             <a class="nav-link" id="login" href="/login/">
@@ -46,11 +54,10 @@
                     {% endif %}
                     </li>
                 </ul>
-            </div>
-            <!-- <div class="jumbotron home-logo"></div> -->
+            </div>  
         </nav>
-        <div class="jumbotron home-logo"></div>
-        <div class="border-top border-dark rounded-bottom"></div>
+        <div class="jumbotron home-logo border-bottom border-dark rounded-bottom"></div>
+        <!-- <div class="border-top border-dark rounded-bottom"></div> -->
 
         <!-- main functionality -->
         <div class="container">
