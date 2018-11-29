@@ -3,6 +3,7 @@
     <a class="navbar-brand ml-2" href="/">XENIA</a>
 
     {% if loggedIn %}
+    
     <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#topNavBar">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -10,6 +11,21 @@
     <!-- Items -->
     <div class="collapse navbar-collapse" id="topNavBar">
         <ul class="nav navbar-nav ml-auto">
+            <li class="nav-item mr-2">
+                    <a class="nav-link" href="/events" id="navbarDropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-sticky-note-o"  aria-hidden="true"></i>&nbsp; Events</a></li>
+            <li class="">
+                    <a class="nav-link" href="/partners" id="navbarDropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-building" aria-hidden="true"></i>&nbsp; Partners</a></li>
+            <li class="nav-item mr-2">
+                    <a class="nav-link" href="/keywords" id="navbarDropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-hashtag" aria-hidden="true"></i>&nbsp; Keywords</a></li>
+            <li class="nav-item mr-2">
+                    <a class="nav-link" href="/faculty" id="navbarDropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-users" aria-hidden="true"></i>&nbsp; Faculty</a></li>
+            <li class="nav-item mr-2">
+                    <a class="nav-link" href="/admin" id="navbarDropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-vcard-o" aria-hidden="true"></i>&nbsp; Admin</a></li>
             <li class="nav-item dropdown mr-2">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-user-circle" aria-hidden="true"></i>&nbsp; {{loggedIn.stu_grp.grp_name}}
@@ -24,5 +40,7 @@
             </li>
         </ul>
     </div>
+    {% else %}
+    
     {% endif %}
 </nav>

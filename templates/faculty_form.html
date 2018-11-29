@@ -4,6 +4,7 @@
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
             </head>
             <body>
+                    {% include 'navigation-bar.html' %}
                 <form method="POST" action="/faculty/add">
                 <div class="container">
                     <header class="blog-header py-3">
@@ -11,7 +12,7 @@
                                 <div class="col-12 text-center">
                                     <h2 class="blog-header-logo text-dark">
     
-                                        <button type="submit" class="btn btn-light btn-sm float-left click-red" dat-href="/faculty/add">Post</button>
+                                        <button type="submit" class="btn btn-light btn-sm float-left" dat-href="/faculty/add">Post</button>
                                         {% if fac_name %}
                                         {{fac_name}} 
                                         {% else %}
@@ -31,12 +32,12 @@
                             <div class="col-md-8">
                             <div class="form-group">
                                 <label for="fac_id">Faculty ID:</label>
-                                <input class="form-control" name="fac_id" {% if fac_id %} value = "{{fac_id}}" readonly="readonly" {% endif %}>
+                                <input class="form-control" required="required" aria-required="true" name="fac_id" {% if fac_id %} value = "{{fac_id}}" readonly="readonly" {% endif %}>
                             </div>
                             <hr>
                             <div class="form-group">
                                 <label for="fac_name">Faculty Name:</label>
-                                <input class="form-control" name="fac_name" {% if fac_name %} value = "{{fac_name}}" {% endif %}>
+                                <input class="form-control" required="required" aria-required="true" name="fac_name" {% if fac_name %} value = "{{fac_name}}" {% endif %}>
                             </div>
                             <hr>
                             <div class="form-group">

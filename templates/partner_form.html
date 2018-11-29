@@ -2,8 +2,11 @@
         <head>
                 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
+                <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+    
             </head>
             <body>
+                    {% include 'navigation-bar.html' %}
                 <form method="POST" action="/partners/add">
                 <div class="container">
                     <header class="blog-header py-3">
@@ -11,7 +14,7 @@
                                 <div class="col-12 text-center">
                                     <h2 class="blog-header-logo text-dark">
     
-                                        <button type="submit" class="btn btn-light btn-sm float-left click-red" dat-href="/partners/add">Post</button>
+                                        <button type="submit" class="btn btn-light btn-sm float-left" dat-href="/partners/add">Post</button>
                                         {% if part_name %}
                                         {{part_name}} 
                                         {% else %}
@@ -31,12 +34,12 @@
                             <div class="col-md-8">
                             <div class="form-group">
                                 <label for="part_id">Partner ID:</label>
-                                <input class="form-control" name="part_id" {% if part_id %} value = "{{part_id}}" readonly="readonly"{% endif %}>
+                                <input class="form-control" required="required" aria-required="true" name="part_id" {% if part_id %} value = "{{part_id}}" readonly="readonly"{% endif %}>
                             </div>
                             <hr>
                             <div class="form-group">
                                 <label for="part_name">Partner Name:</label>
-                                <input class="form-control" name="part_name" {% if part_name %} value = "{{part_name}}" {% endif %}>
+                                <input class="form-control" required="required" aria-required="true" name="part_name" {% if part_name %} value = "{{part_name}}" {% endif %}>
                             </div>
                             <hr>       
                             

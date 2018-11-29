@@ -9,13 +9,14 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </head>
     <body>
-        <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+            {% include 'navigation-bar.html' %}
+        <!----<nav class="navbar navbar-expand-md bg-dark navbar-dark">
             <a class="navbar-brand ml-2" href="/">XENIA</a>
             <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#topNavBar">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <!-- Items -->
+          
             <div class="collapse navbar-collapse" id="topNavBar">
                 <form class="form-inline m-0" role="search" method="get" action="/search">
                     <input id= "query" type="text" class="form-control mr-sm-2" name="query" placeholder="add search if needed">
@@ -23,7 +24,7 @@
                 </form>
                 <ul class="nav navbar-nav ml-auto">
                 
-                    <!-- need implementation -->
+                  
                     {% if loggedIn %}
                         <li class="nav-item">
                             <a class="nav-link" href= ""></a>
@@ -55,7 +56,7 @@
                     </li>
                 </ul>
             </div>  
-        </nav>
+        </nav> -->
         <div class="jumbotron home-logo border-bottom border-dark rounded-bottom"></div>
         <!-- <div class="border-top border-dark rounded-bottom"></div> -->
 

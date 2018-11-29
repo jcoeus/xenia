@@ -30,12 +30,12 @@
                         
                             <div class="form-group">
                                 <label for="ev_name">Event Name:</label>
-                                <input class="form-control" name="ev_name" {% if ev_name %} value = "{{ev_name}}" {% endif %}>
+                                <input class="form-control" name="ev_name" {% if ev_name %} value = "{{ev_name}}" {% else %} value = " " {% endif %}>
                             </div>
                             <hr>
                             <div class="form-group">
                                 <label for="ev_des">Event Description:</label>
-                                <textarea class="form-control" rows="3" name="ev_des">{% if ev_des %}{{ev_des}}{% endif %}</textarea>
+                                <textarea class="form-control" rows="3" name="ev_des">{% if ev_des %}{{ev_des}} {% endif %}</textarea>
                             </div>
                             <hr>            
                             <div class="form-group">
@@ -90,27 +90,27 @@
                             <div class="p-2 mb-2 bg-light rounded">
                                 <div class="form-group">
                                     <label for="term">Term</label>
-                                    <input type="form-control" name="term" {% if term %} value="{{term}}" {% endif %}>
+                                    <input type="form-control" required="required" aria-required="true" name="term" {% if term %} value="{{term}}"{% else %} value= "" {% endif %}>
                                 </div>
                                 <hr>
                                     <div class="form-group">
                                             <label for="day_start">Start Date:</label>
-                                            <input type="date" class="form-control" name="day_start" {% if day_start %} value="{{day_start}}" {% endif %}>
+                                            <input type="date" required="required" aria-required="true" class="form-control" name="day_start" {% if day_start %} value="{{day_start}}" {% else %} value = "{{today}}" {% endif %}>
                                         </div><hr>
                                         <div class="form-group">
                                             <label for="day_end">End Date:</label>
-                                            <input type="date" class="form-control" name="day_end" {% if day_end %} value="{{day_end}}" {% endif %}>
+                                            <input type="date" required="required" aria-required="true" class="form-control" name="day_end" {% if day_end %} value="{{day_end}}" {% else %} value = "{{today}}" {% endif %}>
                                         </div>
                             </div>
                             <div class="p-2">
                                 <div class="form-group">
                                     <label for="time_per_session">Time per Session (hr):</label>
-                                    <input class="form-control" name="time_per_session" {% if time_per_session %} value="{{time_per_session}}" {% endif %}>
+                                    <input class="form-control" required="required" aria-required="true" name="time_per_session" {% if time_per_session %} value="{{time_per_session}}"{% else %} value = "0.0" {% endif %}>
                                 </div>
                                 <hr>
                                 <div>
                                         <label for="total_time">Total Time (hr):</label>
-                                        <input class="form-control" name="total_time" {% if total_time %} value="{{total_time}}" {% endif %} >
+                                        <input class="form-control" required="required" aria-required="true" name="total_time" {% if total_time %} value="{{total_time}}" {% else %} value = "0.0" {% endif %} >
                                 </div>
                                 
                             </div>
