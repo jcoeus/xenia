@@ -637,6 +637,38 @@ def del_partner(part_id):
 
   return redirect('/partners')
 
+@app.route('/keywords')
+def keywords():
+  cursor = g.conn.execute("SELECT * FROM keyword")
+  keywords = {}
+  for result in cursor:
+    keywords[result['top_id']] = result['top_name']
+  cursor.close()
+
+  context = dict(keywords = keywords)
+  return render_template("keywords.html", **context)
+
+@app.route('/keywords/$<key_id>')
+def get_keyword(key_id):
+  print "get keyword accessed"
+  cmd = "SELECT * FROM keyword WHERE top_id = :top_id1"
+  cursor = g.conn.execute(text(cmd), top_id1 = key_id)
+  result = cursor.fetchone()
+  context = {'key_id':result['top_id'],'key_name':result['top_name']}
+  events = {}
+
+  try:
+    cmd = "SELECT e.ev_id, e.ev_name, e.day_start, e.day_end FROM event e INNER JOIN cover c ON e.ev_id = c.ev_id WHERE c.top_id = :top_id1"
+    cursor = g.conn.execute(text(cmd), top_id1 = key_id)
+    for result in cursor:
+      events[result['ev_id']] = {'ev_name':result['ev_name'], 'day_start':result['day_start'], 'day_end':result['day_end']}
+    tmp = dict(events = events)
+    context.update(tmp)
+  except: 
+    print "something went wrong fetching recent events"
+
+  cursor.close()
+  return render_template("keyword_page.html", **context)
 
 @app.route('/logout/')
 def logout():
