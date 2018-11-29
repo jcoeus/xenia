@@ -1,47 +1,39 @@
-<html lang="en">
-{% block title %}
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <link href='https://fonts.googleapis.com/css?family=Satisfy' rel='stylesheet' type='text/css'>
-</head>
-{% endblock %}
+<html>
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link href='https://fonts.googleapis.com/css?family=Satisfy' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+    </head>
 
-{% block content %}
+    <body>
+        {% include 'navigation-bar.html' %}
+        <div class="container-fluid mt-md-5" align="center">
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
 
-<body>
-    <div class="container-fluid" align="center">
-        <div class="jumbotron">
-            <a href="/" role="button"> Logo goes here <br> (click to go back to home page) </a>
-        </div>
-        <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-6">
-                <div class="panel panel-default">
-                    <div class="panel-body">
+                            <h2>Log In</h2><br>
+                            {% from "_formhelpers.html" import render_field %}
+                            <form method=post>
+                              <div class="form-group">
+                                {{ render_field(form.email) }}
+                                {{ render_field(form.password) }}
+                              </div>
+                              <button class="btn btn-success" type="submit">Log in</button>
+                            </form>
+                        </div>
 
-                        <h2>Log In</h2><br>
-                        {% from "_formhelpers.html" import render_field %}
-                        <form method=post>
-                          <div class="form-group">
-                            {{ render_field(form.email) }}
-                            {{ render_field(form.password) }}
-                          </div>
-                          <button class="btn btn-success" type="submit">Log in</button>
-                        </form>
+                        <div class="card-footer">
+                            Don't have an account? <a href="/signup/">Click here</a> to sign up.
+                        </div>
+
                     </div>
-
-                    <div class="panel-footer">
-                        Don't have an account? <a href="/signup/">Click here</a> to sign up.
-                    </div>
-
                 </div>
+                <div class="col-md-3"></div>
             </div>
-            <div class="col-md-3"></div>
         </div>
-    </div>
-</body>
-
-{% endblock %}
+    </body>
 
 </html>

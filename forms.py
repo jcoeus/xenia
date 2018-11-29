@@ -11,3 +11,15 @@ class SignUpForm(Form):
 class LogInForm(Form):
 	email = EmailField('Email', validators=[validators.DataRequired(), validators.Length(min=6, max=35), Email("Please enter your email address.")])
 	password = PasswordField('Password', validators=[validators.DataRequired(), validators.Length(min=3, max=35)])
+
+	def validate(self, data, isValid):
+		rv = Form.validate(self)
+		if not rv:
+			return False
+		if not data:
+			self.email.errors.append('Unknown Email')
+			return False
+		if not isValid:
+			self.password.errors.append('Invalid Password')
+			return False
+		return True
