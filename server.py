@@ -121,7 +121,7 @@ def new_ev():
   for result in cursor:
     admin[result['adm_id']] = result['adm_name']
  
-  context = dict([('admin', admin)('top_key',top_key),('pat_ins',pat_ins),('fac_att',fac_att),('ev_id', ev_id),('stu_grp',stu_grp),('par_sch',par_sch)])
+  context = dict([('admin', admin),('top_key',top_key),('pat_ins',pat_ins),('fac_att',fac_att),('ev_id', ev_id),('stu_grp',stu_grp),('par_sch',par_sch)])
   context['loggedIn'] = session
 
   return render_template("event_form.html", **context)
