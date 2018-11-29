@@ -53,7 +53,7 @@
                                 <select multiple class="form-control" name="fac_id">
                                     {% if fac_att %}
                                     {% for n in fac_att %}
-                                    <option value = "{{n}}" {% if fac_att[n]['fac_name'] in fac_name %} selected {% endif %}>{{n}} | {{fac_att[n]['fac_name']}}</option>
+                                    <option value = "{{n}}" {% if n in faculty %} selected {% endif %}>{{n}} | {{fac_att[n]['fac_name']}}</option>
                                     {% endfor %}
                                     {% endif %}
                                 </select>
@@ -76,11 +76,11 @@
                             </div>
                             <div class="form-group">
                                 <label for ="photo"> Photos: </label>
-                                <input class="form-control" name="photo">
+                                <input class="form-control" name="photo" {% if photos %} value = "{{photo}}" {% endif %}>
                             </div>
                             <div class="form-group">
                                 <label for="notes"> Notes:</label>
-                                <textarea class="form-control" rows="3" name="notes"></textarea>
+                                <textarea class="form-control" rows="3" name="notes">{% if notes %}{{notes}}{% endif %}</textarea>
                             </div>
                         
                     </div>
@@ -88,7 +88,7 @@
                             <div class="p-2 mb-2 bg-light rounded">
                                 <div class="form-group">
                                     <label for="term">Term</label>
-                                    <input type="form-control" name="term">
+                                    <input type="form-control" name="term" {% if term %} value="{{term}}" {% endif %}>
                                 </div>
                                 <hr>
                                     <div class="form-group">
@@ -133,6 +133,16 @@
                                                 <option value ="specific">specific</option>
                                             </select>
                                         </div>
+                                    <div class="form-group">
+                                        <lable for="admin">Administrators</lable>
+                                        <select class="form-control" name="admin" multiple>
+                                            {% if admin %}
+                                            {% for n in admin %}
+                                            <option value="{{n}}" {% if n in admin_name %} selected {% endif %}>{{admin[n]}}</option>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </select>
+                                    </div>
                             </div>
     
                         </aside>

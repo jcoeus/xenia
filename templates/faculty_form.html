@@ -1,0 +1,89 @@
+<html>
+        <head>
+                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
+            </head>
+            <body>
+                <form method="POST" action="/faculty/add">
+                <div class="container">
+                    <header class="blog-header py-3">
+                        <div class="row flex-nowrap justify-content-between align-items-center">
+                                <div class="col-12 text-center">
+                                    <h2 class="blog-header-logo text-dark">
+    
+                                        <button type="submit" class="btn btn-light btn-sm float-left click-red" dat-href="/faculty/add">Post</button>
+                                        {% if fac_name %}
+                                        {{fac_name}} 
+                                        {% else %}
+                                        Add New Faculty
+                                        {% endif %}
+                                        <button type="button" class="btn btn-light btn-sm float-right click-red" {% if fac_id %} data-href = "/faculty/@{{fac_id}}/del_faculty" {% else %} data-href = "/faculty" {% endif %}>Delete</button>
+                                        <hr>
+                                    </h2>
+                                    
+                                </div>
+                                
+                        </div>
+                    </header>
+                    <main role="main" class="container">
+                        <div class="container">
+                        <div class="row">
+                            <div class="col-md-8">
+                            <div class="form-group">
+                                <label for="fac_id">Faculty ID:</label>
+                                <input class="form-control" name="fac_id" {% if fac_id %} value = "{{fac_id}}" readonly="readonly" {% endif %}>
+                            </div>
+                            <hr>
+                            <div class="form-group">
+                                <label for="fac_name">Faculty Name:</label>
+                                <input class="form-control" name="fac_name" {% if fac_name %} value = "{{fac_name}}" {% endif %}>
+                            </div>
+                            <hr>
+                            <div class="form-group">
+                                <label for="evaluation">Evaluation:</label>
+                                <textarea class="form-control" rows="3" name="evaluation">{% if evaluation %}{{evaluation}}{% endif %}</textarea>
+                            </div>
+                            <hr>            
+                            
+                        
+                    </div>
+                    <aside class="col-md-4 blog-sidebar">
+                            <div class="p-2 mb-2 bg-light rounded">
+                                    <div class="form-group">
+                                            <label for ="dep_id">Department:</label>
+                                            <select class="form-control" name="dep_id">
+                                                {% if dept %}
+                                                {% for n in dept %}
+                                                <option value = "{{n}}" {% if n == dep_id %} selected {% endif %}>{{n}} | {{dept[n]}}</option>
+                                                {% endfor %}
+                                                {% endif %}
+                                            </select>
+                                        </div>
+                                <hr>
+                                    
+                            </div>
+                            
+    
+                        </aside>
+                    </div>
+                    </main>
+                </div>
+            
+                    
+                </div>
+                <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+                <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/bootstrap-select.min.js"></script>
+                <script>
+                    jQuery(document).ready(function($) {
+                        $(".click-red").click(function() {
+                            window.location = $(this).data("href");
+                        });
+                    });
+
+                </script>
+                </form>
+            </body>
+        
+</html>

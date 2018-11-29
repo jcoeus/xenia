@@ -61,10 +61,10 @@
                                 
                             <hr>
                             <p>
-                                    {% if sch_name %}
+                                    {% if partners %}
                                     <p><b>Partner Institutions:</b></p>
-                                    {% for n in sch_name %}
-                                        <li>{{n}}</li>
+                                    {% for n in partners %}
+                                        <li class = "click-red" data-href="/partners/-{{n}}">{{partners[n]}}</li>
                                     {% endfor %}
                                     {% else %}
                                     <p><b>There are no partner institutions</b></p>
@@ -72,10 +72,10 @@
                                 </p>
                             <hr>
                             <p>
-                                    {% if fac_name %}
+                                    {% if faculty %}
                                     <p><b>Faculty Attending:</b></p>
-                                    {% for n in fac_name %}
-                                        <li>{{n}}</li>
+                                    {% for n in faculty %}
+                                        <li class = "click-red" data-href="/faculty/@{{n}}">{{faculty[n]}}</li>
                                     {% endfor %}
                                     {% else %}
                                     <p><b>There are no faculty attending</b></p>
@@ -86,12 +86,41 @@
                                     {% if key_name %}
                                     <p><b>Keywords:</b></p>
                                     {% for n in key_name %}
-                                        <li>{{n}}</li>
+                                        <a href ="/keywords/#{{n}}">#{{key_name[n]}} </a>
                                     {% endfor %}
                                     {% else %}
                                     <p><b>There are no keywords</b></p>
                                     {% endif %}
                                 </p>
+                            <hr>
+                            
+                            {% if participants %}
+                            <p><b>Participants:</b></p>
+                            <table class="table table-light">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Number</th>
+                                        <th scope="col">Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                    {% for n in participants %}
+                                    <tr>
+                                        <td>{{participants[n]['par_name']}}</td>
+                                        <td>{{participants[n]['number']}}</td>
+                                        <td>{{participants[n]['type']}}</td>
+                                        
+                                    </tr>
+                                    {% endfor %}
+                                    
+                                </tbody>
+                            </table>
+                            
+                            {% else %}
+                            <p><b>There are no participants listed</b></p>
+                            {% endif %}
                             <hr>
                             <p>
     
@@ -132,6 +161,16 @@
                             <p class="font-italic">Total Time:</p>
                             {% if total_time %}
                             <p>{{ total_time }} hr</p>
+                            {% endif %}
+                        </div>
+                        <div class="p-3 mb-3 bg-light rounded">
+                            {% if admin %}
+                            <p><b>Administrators:</b></p>
+                            {% for n in admin %}
+                            <li class = "click-red" data-href="/admin/+{{n}}">{{admin[n]}}</li>
+                            {% endfor %}
+                            {% else %}
+                            <p><b>There are no adminstrators</b></p>
                             {% endif %}
                         </div>
 

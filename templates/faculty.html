@@ -1,0 +1,55 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    </head>
+    <body>
+        <div class="container">
+            <header class="blog-header py-3">
+                    <div class="row flex-nowrap justify-content-between align-items-center">
+                            <div class="col-12 text-center">
+                                <h2 class="blog-header-logo text-dark">
+                                    Faculty
+                                    <button type="button" class="btn btn-light btn-sm float-right click-red" data-href="/faculty/new">Add Faculty</button>
+                                    <hr>
+                                </h2>
+                                
+                            </div>
+                            
+                    </div>
+            </header>
+        <main role="main" class="container">
+                <table class="table table-light">
+                        <thead>
+                            <tr>
+                                <th scope="col">Faculty ID</th>
+                                <th scope="col">Faculty Name</th>
+                                <th scope="col">Department</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if faculty %}
+                            {% for n in faculty %}
+                            <tr class='click-red' data-href="/faculty/@{{n}}">
+                                <td>{{n}}</td>
+                                <td>{{faculty[n]['fac_name']}}</td>
+                                <td>{{faculty[n]['dep_id']}}</td>
+                            </tr>
+                            {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+        </main>  
+        </div>  
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script>
+            jQuery(document).ready(function($) {
+                $(".click-red").click(function() {
+                    window.location = $(this).data("href");
+                });
+            });
+        </script>
+    </body>
+
+</html>

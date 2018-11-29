@@ -69,7 +69,7 @@ def student_groups():
 
 @app.route('/events')
 def events():
-  cursor = g.conn.execute("SELECT ev_id, ev_name, day_start, day_end FROM event")
+  cursor = g.conn.execute("SELECT ev_id, ev_name, day_start, day_end FROM event ORDER BY day_start DESC")
   events = []
   for result in cursor:
     temp = []
@@ -118,45 +118,67 @@ def new_ev():
   top_key = {}
   for result in cursor:
     top_key[result['top_id']] = {'top_name':result['top_name']}
+  
+  cursor = g.conn.execute("SELECT * FROM admin")
+  admin = {}
+  for result in cursor:
+    admin[result['adm_id']] = result['adm_name']
  
-  context = dict([('top_key',top_key),('pat_ins',pat_ins),('fac_att',fac_att),('ev_id', ev_id),('stu_grp',stu_grp),('par_sch',par_sch)])
+  context = dict([('admin',admin),('top_key',top_key),('pat_ins',pat_ins),('fac_att',fac_att),('ev_id', ev_id),('stu_grp',stu_grp),('par_sch',par_sch)])
 
   return render_template("event_form.html", **context)
 
 @app.route('/events/~<ev_id>')
 def event_page(ev_id):
-  cursor = g.conn.execute("SELECT * FROM event WHERE ev_id = '"+ ev_id+"'")
+  cmd = "SELECT * FROM event WHERE ev_id = :ev_id1"
+  cursor = g.conn.execute(text(cmd), ev_id1 = ev_id)
   res = cursor.fetchone()
 
   #get student group names involved
-  cursor = g.conn.execute("SELECT grp_name FROM event e INNER JOIN hold h ON e.ev_id = h.ev_id INNER JOIN student_group sg ON h.grp_id = sg.grp_id WHERE e.ev_id='"+ev_id+"' ")
+  cmd = "SELECT grp_name FROM event e INNER JOIN hold h ON e.ev_id = h.ev_id INNER JOIN student_group sg ON h.grp_id = sg.grp_id WHERE e.ev_id = :ev_id1 "
+  cursor = g.conn.execute(text(cmd), ev_id1 = ev_id)
   sg = []
   for result in cursor:
     sg.append(result['grp_name'])
 
   #get partner school names involved
-  cursor = g.conn.execute("SELECT sch_name FROM event e INNER JOIN partner p ON e.ev_id = p.ev_id INNER JOIN partner_school ps ON p.sch_id = ps.sch_id WHERE e.ev_id='"+ev_id+"' ")
-  ps = []
+  cmd = "SELECT ps.sch_id, sch_name FROM event e INNER JOIN partner p ON e.ev_id = p.ev_id INNER JOIN partner_school ps ON p.sch_id = ps.sch_id WHERE e.ev_id = :ev_id1"
+  cursor = g.conn.execute(text(cmd), ev_id1 = ev_id)
+  ps = {}
   for result in cursor:
-    ps.append(result['sch_name'])
+    ps[result['sch_id']] = result['sch_name']
 
   #get keywords/topics about event
-  cursor = g.conn.execute("SELECT top_name FROM event e INNER JOIN cover c ON e.ev_id = c.ev_id INNER JOIN keyword k ON c.top_id = k.top_id WHERE e.ev_id='"+ev_id+"' ")
-  kt = []
+  cmd = "SELECT c.top_id, top_name FROM event e INNER JOIN cover c ON e.ev_id = c.ev_id INNER JOIN keyword k ON c.top_id = k.top_id WHERE e.ev_id = :ev_id1"
+  cursor = g.conn.execute(text(cmd), ev_id1 = ev_id)
+  kt = {}
   for result in cursor:
-    kt.append(result['top_name'])
-
+    kt[result['top_id']] = result['top_name']
+    
   #get faculty involved
-  cursor = g.conn.execute("SELECT fac_name FROM event e INNER JOIN attend a ON e.ev_id = a.ev_id INNER JOIN faculty f ON a.fac_id = f.fac_id WHERE e.ev_id='"+ev_id+"' ")
-  ft = []
+  cmd = "SELECT a.fac_id, fac_name FROM event e INNER JOIN attend a ON e.ev_id = a.ev_id INNER JOIN faculty f ON a.fac_id = f.fac_id WHERE e.ev_id = :ev_id1"
+  cursor = g.conn.execute(text(cmd), ev_id1 = ev_id)
+  ft = {}
   for result in cursor:
-    ft.append(result['fac_name'])
+    ft[result['fac_id']] = result['fac_name']
 
   #get admin involved
+  cmd = "SELECT a.adm_id, adm_name FROM event e INNER JOIN administrate a ON e.ev_id = a.ev_id INNER JOIN admin ad ON ad.adm_id = a.adm_id WHERE e.ev_id = :ev_id1"
+  cursor = g.conn.execute(text(cmd), ev_id1 = ev_id)
+  ad = {}
+  for result in cursor:
+    ad[result['adm_id']] = result['adm_name']
 
+  #get participant groups
+  cmd = "SELECT p.par_id, p.par_name, number, type FROM event e INNER JOIN participate par ON e.ev_id = par.ev_id INNER JOIN participant p ON  par.par_id = p.par_id WHERE e.ev_id =:ev_id1"
+  cursor = g.conn.execute(text(cmd), ev_id1 = ev_id)
+  par = {}
+  for result in cursor:
+    par[result['par_id']] = {'par_name':result['par_name'],'number':result['number'],'type':result['type']}
 
   cursor.close()
-  context = dict([('fac_name',ft),('key_name',kt),('sch_name',ps),('ev_type',res['ev_type'],),('time_per_session',res['time_per_session'],),('total_time',res['total_time']),('general_act', res['general_act']),('term',res['term']),('ev_id',res['ev_id']), ('ev_name', res['ev_name']),('ev_des', res['ev_des']),('day_start',res['day_start']),('day_end',res['day_end']),('specific_act',res['specific_act']),('photo',res['photo']),('notes',res['notes']), ('group_names', sg)])
+
+  context = dict([('participants',par),('admin', ad),('faculty',ft),('key_name',kt),('partners',ps),('ev_type',res['ev_type'],),('time_per_session',res['time_per_session'],),('total_time',res['total_time']),('general_act', res['general_act']),('term',res['term']),('ev_id',res['ev_id']), ('ev_name', res['ev_name']),('ev_des', res['ev_des']),('day_start',res['day_start']),('day_end',res['day_end']),('specific_act',res['specific_act']),('photo',res['photo']),('notes',res['notes']), ('group_names', sg)])
   
   return render_template("event_page.html", **context)
 
@@ -177,6 +199,7 @@ def add_event(ev_id):
   ev_type = request.form['ev_type']
   ev_des = request.form['ev_des']
   
+  admin = request.form.getlist('admin')
   grp_id = request.form.getlist('grp_id')
   print grp_id
   top_id = request.form['top_id']
@@ -206,18 +229,29 @@ def add_event(ev_id):
       if key_dict[n] not in top_dict[n]:
         top_dict[n] = top_dict[n] + ', ' + key_dict[n]
 
-
-  g.conn.execute("DELETE FROM hold WHERE ev_id = '"+ev_id+"'")
-  g.conn.execute("DELETE FROM cover WHERE ev_id ='"+ev_id+"'")
-  g.conn.execute("DELETE FROM partner WHERE ev_id ='"+ev_id+"'")
-  g.conn.execute("DELETE FROM attend WHERE ev_id ='"+ev_id+"'")
-  g.conn.execute("DELETE FROM event WHERE ev_id ='"+ev_id+"'")
+  cmd = "DELETE FROM administrate WHERE ev_id = :ev_id1"
+  g.conn.execute(text(cmd), ev_id1 = ev_id)
+  cmd = "DELETE FROM participate WHERE ev_id = :ev_id1"
+  g.conn.execute(text(cmd), ev_id1 = ev_id)
+  cmd = "DELETE FROM volunteer WHERE ev_id = :ev_id1"
+  g.conn.execute(text(cmd), ev_id1 = ev_id)
+  cmd = "DELETE FROM hold WHERE ev_id = :ev_id1"
+  g.conn.execute(text(cmd), ev_id1 = ev_id)
+  cmd = "DELETE FROM cover WHERE ev_id = :ev_id1"
+  g.conn.execute(text(cmd), ev_id1 = ev_id)
+  cmd = "DELETE FROM partner WHERE ev_id = :ev_id1"
+  g.conn.execute(text(cmd), ev_id1 = ev_id)
+  cmd = "DELETE FROM attend WHERE ev_id = :ev_id1"
+  g.conn.execute(text(cmd), ev_id1 = ev_id)
+  cmd = "DELETE FROM event WHERE ev_id = :ev_id1"
+  g.conn.execute(text(cmd), ev_id1 = ev_id)
 
   insert_event = 'INSERT INTO event VALUES (:ev_id1, :day_start1, :day_end1, :general_act1, :specific_act1, :photo1, :total_time1, :time_per_session1, :notes1, :term1, :ev_name1, :ev_type1, :ev_des1)' 
   insert_cover = 'INSERT INTO cover VALUES (:ev_id1,:top_id1)'
   insert_attend = 'INSERT INTO attend VALUES (:ev_id1,:fac_id1)'
   insert_partner = 'INSERT INTO partner VALUES (:ev_id1,:sch_id1)'
   insert_hold = 'INSERT INTO hold VALUES (:grp_id1, :ev_id1)'
+  insert_admin = 'INSERT INTO administrate VALUES (:adm_id1, :ev_id1)'
 
   g.conn.execute(text(insert_event),ev_id1 = ev_id, day_start1 = day_start, day_end1 = day_end, general_act1 = general_act, specific_act1 = specific_act, photo1 = photo, total_time1 = total_time, time_per_session1 = time_per_session, notes1 = notes, term1 = term, ev_name1 =ev_name, ev_type1 = ev_type, ev_des1 = ev_des)
   for n in grp_id:
@@ -228,40 +262,52 @@ def add_event(ev_id):
     g.conn.execute(text(insert_attend),ev_id1 = ev_id, fac_id1 = n)
   for n in sch_id:
     g.conn.execute(text(insert_partner),ev_id1 = ev_id, sch_id1 = n)
+  for n in admin:
+    g.conn.execute(text(insert_admin), ev_id1 = ev_id, adm_id1 = n)
   
   return redirect('/events/~'+ev_id)
 
 @app.route('/events/~<ev_id>/edit_ev')
 def edit_ev(ev_id):
   #get event info
-  cursor = g.conn.execute("SELECT * FROM event WHERE ev_id = '"+ ev_id+"'")
+  cmd = "SELECT * FROM event WHERE ev_id = :ev_id1"
+  cursor = g.conn.execute(text(cmd), ev_id1 = ev_id)
   res = cursor.fetchone()
 
   #get list of student group names involved
-  cursor = g.conn.execute("SELECT grp_name FROM event e INNER JOIN hold h ON e.ev_id = h.ev_id INNER JOIN student_group sg ON h.grp_id = sg.grp_id WHERE e.ev_id='"+ev_id+"' ")
+  cmd = "SELECT grp_name FROM event e INNER JOIN hold h ON e.ev_id = h.ev_id INNER JOIN student_group sg ON h.grp_id = sg.grp_id WHERE e.ev_id = :ev_id1"
+  cursor = g.conn.execute(text(cmd), ev_id1 = ev_id)
   sg = []
   for result in cursor:
     sg.append(result['grp_name'])
 
   #get list of partner school names involved
-  cursor = g.conn.execute("SELECT sch_name FROM event e INNER JOIN partner p ON e.ev_id = p.ev_id INNER JOIN partner_school ps ON p.sch_id = ps.sch_id WHERE e.ev_id='"+ev_id+"' ")
+  cmd = "SELECT sch_name FROM event e INNER JOIN partner p ON e.ev_id = p.ev_id INNER JOIN partner_school ps ON p.sch_id = ps.sch_id WHERE e.ev_id= :ev_id1"
+  cursor = g.conn.execute(text(cmd), ev_id1 = ev_id)
   ps = []
   for result in cursor:
     ps.append(result['sch_name'])
 
   #get keywords/topics about event
-  cursor = g.conn.execute("SELECT top_name FROM event e INNER JOIN cover c ON e.ev_id = c.ev_id INNER JOIN keyword k ON c.top_id = k.top_id WHERE e.ev_id='"+ev_id+"' ")
+  cmd = "SELECT top_name FROM event e INNER JOIN cover c ON e.ev_id = c.ev_id INNER JOIN keyword k ON c.top_id = k.top_id WHERE e.ev_id = :ev_id1"
+  cursor = g.conn.execute(text(cmd), ev_id1 = ev_id)
   kt = []
   for result in cursor:
     kt.append(result['top_name'])
 
   #get list of faculty involved
-  cursor = g.conn.execute("SELECT fac_name FROM event e INNER JOIN attend a ON e.ev_id = a.ev_id INNER JOIN faculty f ON a.fac_id = f.fac_id WHERE e.ev_id='"+ev_id+"' ")
-  ft = []
+  cmd = "SELECT a.fac_id, fac_name FROM event e INNER JOIN attend a ON e.ev_id = a.ev_id INNER JOIN faculty f ON a.fac_id = f.fac_id WHERE e.ev_id = :ev_id1"
+  cursor = g.conn.execute(text(cmd), ev_id1 = ev_id)
+  ft = {}
   for result in cursor:
-    ft.append(result['fac_name'])
+    ft[result['fac_id']] = result['fac_name']
 
   #get admin involved
+  cmd = "SELECT a.adm_id, adm_name FROM event e INNER JOIN administrate a ON e.ev_id = a.ev_id INNER JOIN admin ad ON ad.adm_id = a.adm_id WHERE e.ev_id = :ev_id1"
+  cursor = g.conn.execute(text(cmd), ev_id1 = ev_id)
+  ad = {}
+  for result in cursor:
+    ad[result['adm_id']] = result['adm_name']
 
   #get list of possibe student groups
   cursor = g.conn.execute("SELECT grp_id, grp_name FROM student_group")
@@ -281,47 +327,50 @@ def edit_ev(ev_id):
   for result in cursor:
     fac_att[result['fac_id']] = {'fac_name':result['fac_name']}
 
-  #get list of possible p
+  #get list of possible participating institutions
   cursor = g.conn.execute("SELECT * FROM partner_school")
   pat_ins = {}
   for result in cursor:
     pat_ins[result['sch_id']] = {'sch_name':result['sch_name']}
 
+  #get list of possible keywords
   cursor = g.conn.execute("SELECT * FROM keyword")
   top_key = {}
   for result in cursor:
     top_key[result['top_id']] = {'top_name':result['top_name']}
 
+  #get list of possible admin
+  cursor = g.conn.execute("SELECT * FROM admin")
+  admin = {}
+  for result in cursor:
+    admin[result['adm_id']] = result['adm_name']
+
   cursor.close()
-  context_prev = dict([('fac_name',ft),('key_name',kt),('sch_name',ps),('ev_type',res['ev_type'],),('time_per_session',res['time_per_session'],),('total_time',res['total_time']),('general_act', res['general_act']),('term',res['term']), ('ev_name', res['ev_name']),('day_start',res['day_start']),('day_end',res['day_end']),('specific_act',res['specific_act']),('photo',res['photo']),('notes',res['notes']), ('ev_des',res['ev_des']),('group_names', sg)])
-  context_poss = dict([('top_key',top_key),('pat_ins',pat_ins),('fac_att',fac_att),('ev_id', ev_id),('stu_grp',stu_grp),('par_sch',par_sch)])
+  context_prev = dict([('admin_name', ad),('faculty',ft),('key_name',kt),('sch_name',ps),('ev_type',res['ev_type'],),('time_per_session',res['time_per_session'],),('total_time',res['total_time']),('general_act', res['general_act']),('term',res['term']), ('ev_name', res['ev_name']),('day_start',res['day_start']),('day_end',res['day_end']),('specific_act',res['specific_act']),('photo',res['photo']),('notes',res['notes']), ('ev_des',res['ev_des']),('group_names', sg)])
+  context_poss = dict([('admin', admin),('top_key',top_key),('pat_ins',pat_ins),('fac_att',fac_att),('ev_id', ev_id),('stu_grp',stu_grp),('par_sch',par_sch)])
 
   context = context_prev.copy()
   context.update(context_poss)
-
 
   return render_template("event_form.html", **context)
 
 
 @app.route('/events/~<ev_id>/delete_ev')
 def delete_ev(ev_id):
-  g.conn.execute("DELETE FROM hold WHERE ev_id = '"+ev_id+"'")
-  g.conn.execute("DELETE FROM cover WHERE ev_id ='"+ev_id+"'")
-  g.conn.execute("DELETE FROM partner WHERE ev_id ='"+ev_id+"'")
-  g.conn.execute("DELETE FROM attend WHERE ev_id ='"+ev_id+"'")
-  g.conn.execute("DELETE FROM event WHERE ev_id ='"+ev_id+"'")
+  cmd = "DELETE FROM volunteer WHERE ev_id = :ev_id1"
+  g.conn.execute(text(cmd), ev_id1 = ev_id)
+  cmd = "DELETE FROM hold WHERE ev_id = :ev_id1"
+  g.conn.execute(text(cmd), ev_id1 = ev_id)
+  cmd = "DELETE FROM cover WHERE ev_id = :ev_id1"
+  g.conn.execute(text(cmd), ev_id1 = ev_id)
+  cmd = "DELETE FROM partner WHERE ev_id = :ev_id1"
+  g.conn.execute(text(cmd), ev_id1 = ev_id)
+  cmd = "DELETE FROM attend WHERE ev_id = :ev_id1"
+  g.conn.execute(text(cmd), ev_id1 = ev_id)
+  cmd = "DELETE FROM event WHERE ev_id = :ev_id1"
+  g.conn.execute(text(cmd), ev_id1 = ev_id)
   return redirect('/events')
 
-@app.route('/add', methods=['POST'])
-def add():
-  stu_id = request.form['stu_id']
-  name = request.form['name']
-  year = request.form['year']
-  dep_id = request.form['dep_id']
-  print stu_id, name, year, dep_id
-  cmd = 'INSERT INTO seas_student VALUES (:stu_id1, :name1, :year1, :dep_id1)' 
-  g.conn.execute(text(cmd),stu_id1 = stu_id,name1 = name, year1 = year, dep_id1 = dep_id)
-  return redirect('/')
 
 @app.route('/signup/', methods=['GET', 'POST'])
 def signup():
@@ -338,11 +387,242 @@ def login():
     # add method to authenticate current user
     return redirect('/')
   return render_template('login.html', form=form)
-'''
-@app.errorhandler(404)
-def page_not_found(e):
-  return render_template('404.html'), 404
-'''
+
+@app.route('/faculty')
+def faculty():
+  cursor = g.conn.execute("SELECT * FROM faculty ORDER BY fac_name")
+  faculty = {}
+  for result in cursor:
+    faculty[result['fac_id']] = {'fac_name': result['fac_name'], 'evaluation':result['evaluation'], 'dep_id':result['dep_id']}
+  cursor.close()
+
+  context = dict(faculty = faculty)
+  return render_template("faculty.html", **context)
+
+@app.route('/faculty/new')
+def new_faculty():
+  
+  cursor = g.conn.execute('SELECT * FROM Department')
+  dept = {}
+  for result in cursor:
+    dept[result['dep_id']] = result['dep_name']
+
+  context = dict(dept = dept)
+  return render_template("faculty_form.html",**context)
+
+@app.route('/faculty/add', methods=['GET','POST'])
+def add_faculty():
+  fac_id = request.form['fac_id']
+  fac_name = request.form['fac_name']
+  evaluation = request.form['evaluation']
+  dep_id = request.form['dep_id']
+
+  try:
+    cmd = "INSERT INTO faculty VALUES (:fac_id1, :fac_name1, :evaluation1, :dep_id1)"
+    g.conn.execute(text(cmd), fac_id1 = fac_id, fac_name1 = fac_name, evaluation1 = evaluation, dep_id1 = dep_id)
+  except:
+    cmd = "UPDATE faculty SET fac_name = :fac_name1, evaluation = :evaluation1, dep_id = :dep_id1 WHERE fac_id = :fac_id1"
+    g.conn.execute(text(cmd), fac_id1 = fac_id, fac_name1 = fac_name, evaluation1 = evaluation, dep_id1 = dep_id)
+
+  return redirect("/faculty/@"+fac_id)
+
+@app.route('/faculty/@<fac_id>')
+def get_faculty(fac_id):
+  cmd = "SELECT * FROM faculty f INNER JOIN department d ON f.dep_id = d.dep_id WHERE f.fac_id = :fac_id1"
+  cursor = g.conn.execute(text(cmd), fac_id1 = fac_id)
+  result = cursor.fetchone()
+  context = {'fac_id': result['fac_id'],'fac_name': result['fac_name'], 'evaluation':result['evaluation'], 'dep_id':result['dep_id'], 'dep_name':result['dep_name']}
+  
+  events = {}
+
+  try:
+    cmd = "SELECT e.ev_id, e.ev_name, e.day_start, e.day_end FROM event e INNER JOIN attend a ON e.ev_id = a.ev_id WHERE a.fac_id = :fac_id1 ORDER BY e.day_start DESC"
+    cursor = g.conn.execute(text(cmd), fac_id1 = fac_id)
+    for result in cursor:
+      events[result['ev_id']] = {'ev_name':result['ev_name'], 'day_start':result['day_start'], 'day_end':result['day_end']}
+    tmp = dict(events = events)
+    context.update(tmp)
+  except: 
+    print "something went wrong fetching recent events"
+  
+  cursor.close()  
+  return render_template("faculty_page.html", **context)
+
+@app.route('/faculty/@<fac_id>/edit_faculty')
+def edit_faculty(fac_id):
+  cmd = "SELECT * FROM faculty WHERE fac_id = :fac_id1"
+  cursor = g.conn.execute(text(cmd), fac_id1 = fac_id)
+  result = cursor.fetchone()
+  context = {'fac_id': result['fac_id'],'fac_name': result['fac_name'], 'evaluation':result['evaluation'], 'dep_id':result['dep_id']}
+  
+  cursor = g.conn.execute('SELECT * FROM Department')
+  dept = {}
+  for result in cursor:
+    dept[result['dep_id']] = result['dep_name']
+
+  tmp = dict(dept = dept)
+  context.update(tmp)
+
+  return render_template("faculty_form.html",**context)
+
+@app.route('/faculty/@<fac_id>/del_faculty')
+def del_faculty(fac_id):
+  cmd = "DELETE FROM attend WHERE fac_id = :fac_id1"
+  g.conn.execute(text(cmd), fac_id1 = fac_id)
+  cmd = "DELETE FROM faculty WHERE fac_id = :fac_id1"
+  g.conn.execute(text(cmd), fac_id1 = fac_id)
+  return redirect('/faculty')
+
+@app.route('/admin')
+def admin():
+  cursor = g.conn.execute("SELECT * FROM admin")
+  admin = {}
+  for result in cursor:
+    admin[result['adm_id']] = {'adm_name': result['adm_name'], 'dep_id':result['dep_id']}
+  cursor.close()
+
+  context = dict(admin = admin)
+  return render_template("admin.html", **context)
+@app.route('/admin/new')
+def new_admin():
+  cursor = g.conn.execute('SELECT * FROM Department')
+  dept = {}
+  for result in cursor:
+    dept[result['dep_id']] = result['dep_name']
+
+  context = dict(dept = dept)
+  return render_template("admin_form.html",**context)
+
+@app.route('/admin/add', methods=['GET','POST'])
+def add_admin():
+  adm_id = request.form['adm_id']
+  adm_name = request.form['adm_name']
+  dep_id = request.form['dep_id']
+
+  try:
+    cmd = "INSERT INTO admin VALUES (:adm_id1, :adm_name1, :dep_id1)"
+    g.conn.execute(text(cmd), adm_id1 = adm_id, adm_name1 = adm_name, dep_id1 = dep_id)
+  except:
+    cmd = "UPDATE admin SET adm_name = :adm_name1, dep_id = :dep_id1 WHERE adm_id = :adm_id1"
+    g.conn.execute(text(cmd), adm_id1 = adm_id, adm_name1 = adm_name, dep_id1 = dep_id)
+
+  return redirect("/admin/+"+adm_id)
+
+@app.route('/admin/+<adm_id>')
+def get_admin(adm_id):
+  cmd = "SELECT * FROM admin a INNER JOIN department d ON a.dep_id = d.dep_id WHERE a.adm_id = :adm_id1"
+  cursor = g.conn.execute(text(cmd), adm_id1 = adm_id)
+  result = cursor.fetchone()
+  context = {'adm_id': result['adm_id'],'adm_name': result['adm_name'], 'dep_id':result['dep_id'], 'dep_name':result['dep_name']}
+  
+  events = {}
+
+  try:
+    cmd = "SELECT e.ev_id, e.ev_name, e.day_start, e.day_end FROM event e INNER JOIN administrate a ON e.ev_id = a.ev_id WHERE a.adm_id = :adm_id1 ORDER BY e.day_start DESC"
+    cursor = g.conn.execute(text(cmd), adm_id1 = adm_id)
+    for result in cursor:
+      events[result['ev_id']] = {'ev_name':result['ev_name'], 'day_start':result['day_start'], 'day_end':result['day_end']}
+    tmp = dict(events = events)
+    context.update(tmp)
+  except: 
+    print "something went wrong fetching recent events"
+  
+  cursor.close()  
+  return render_template("admin_page.html", **context)
+
+@app.route('/admin/+<adm_id>/edit_admin')
+def edit_admin(adm_id):
+  cmd = "SELECT * FROM admin WHERE adm_id = :adm_id1"
+  cursor = g.conn.execute(text(cmd), adm_id1 = adm_id)
+  result = cursor.fetchone()
+  context = {'adm_id': result['adm_id'],'adm_name': result['adm_name'], 'dep_id':result['dep_id']}
+  
+  cursor = g.conn.execute('SELECT * FROM Department')
+  dept = {}
+  for result in cursor:
+    dept[result['dep_id']] = result['dep_name']
+
+  tmp = dict(dept = dept)
+  context.update(tmp)
+
+  return render_template("admin_form.html",**context)
+
+@app.route('/admin/+<adm_id>/del_admin')
+def del_admin(adm_id):
+  cmd = "DELETE FROM administer WHERE adm_id = :adm_id1"
+  g.conn.execute(text(cmd), adm_id1 = adm_id)
+  cmd = "DELETE FROM admin WHERE adm_id = :adm_id1"
+  g.conn.execute(text(cmd), adm_id1 = adm_id)
+  return redirect('/admin')
+
+@app.route('/partners')
+def partners():
+  cursor = g.conn.execute("SELECT * FROM partner_school")
+  partners = {}
+  for result in cursor:
+    partners[result['sch_id']] = {'sch_name': result['sch_name']}
+  cursor.close()
+
+  context = dict(partners = partners)
+  return render_template("partners.html", **context)
+
+@app.route('/partners/-<part_id>')
+def get_partner(part_id):
+  cmd = "SELECT * FROM partner_school WHERE sch_id = :sch_id1"
+  cursor = g.conn.execute(text(cmd), sch_id1 = part_id)
+  result = cursor.fetchone()
+  context = {'part_id':result['sch_id'],'part_name':result['sch_name']}
+  events = {}
+
+  try:
+    cmd = "SELECT e.ev_id, e.ev_name, e.day_start, e.day_end FROM event e INNER JOIN partner p ON e.ev_id = p.ev_id WHERE p.sch_id = :sch_id1"
+    cursor = g.conn.execute(text(cmd), sch_id1 = part_id)
+    for result in cursor:
+      events[result['ev_id']] = {'ev_name':result['ev_name'], 'day_start':result['day_start'], 'day_end':result['day_end']}
+    tmp = dict(events = events)
+    context.update(tmp)
+  except: 
+    print "something went wrong fetching recent events"
+
+  cursor.close()
+  return render_template("partner_page.html", **context)
+
+@app.route('/partners/new')
+def new_partner():
+  return render_template("partner_form.html")
+
+@app.route('/partners/add', methods=['GET','POST'])
+def add_partner():
+  part_id = request.form['part_id'][:10]
+  part_name = request.form['part_name']
+
+  try:
+    cmd = "INSERT INTO partner_school VALUES (:sch_id1, :sch_name1)"
+    g.conn.execute(text(cmd), sch_id1 = part_id, sch_name1 = part_name)
+  except:
+    cmd = "UPDATE partner_school SET sch_name = :sch_name1 WHERE sch_id = :sch_id1"
+    g.conn.execute(text(cmd), sch_id1 = part_id, sch_name1 = part_name)
+
+  return redirect("/partners/-"+part_id)
+
+@app.route('/partners/-<part_id>/edit_partner')
+def edit_partner(part_id):
+  cmd = "SELECT * FROM partner_school WHERE sch_id = :part_id1"
+  cursor = g.conn.execute(text(cmd), part_id1 = part_id)
+  result = cursor.fetchone()
+  context = {'part_id': result['sch_id'],'part_name': result['sch_name']}
+ 
+  return render_template("partner_form.html", **context)
+
+@app.route('/partners/-<part_id>/del_partner')
+def del_partner(part_id):
+  cmd = "DELETE FROM partner WHERE sch_id = :sch_id1"
+  g.conn.execute(text(cmd), sch_id1 = part_id)
+  cmd = "DELETE FROM partner_school WHERE sch_id = :sch_id1"
+  g.conn.execute(text(cmd), sch_id1 = part_id)
+
+  return redirect('/partners')
+
 
 if __name__ == "__main__":
   import click
