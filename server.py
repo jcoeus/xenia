@@ -396,9 +396,9 @@ def login():
       cursor = g.conn.execute(text(cmd), email1=email)
       res = cursor.fetchone()
       isValid = True if res and hashing.check_value(res.password, password, salt=my_salt) else False
-  if form.validate(res, isValid):
-    session['stu_grp'] = dict(grp_id=res.grp_id, grp_name=res.grp_name, email=email)
-    return redirect('/')
+      if form.validate(res, isValid):
+        session['stu_grp'] = dict(grp_id=res.grp_id, grp_name=res.grp_name, email=email)
+        return redirect('/')
   context = dict(form=form, loggedIn=session)
   return render_template('login.html', **context)
 
