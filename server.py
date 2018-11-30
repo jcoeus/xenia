@@ -381,6 +381,8 @@ def edit_ev(ev_id):
 @app.route('/events/~<ev_id>/delete_ev')
 def delete_ev(ev_id):
   if session:
+    cmd = "DELETE FROM administrate WHERE ev_id = :ev_id1"
+    g.conn.execute(text(cmd), ev_id1 = ev_id)
     cmd = "DELETE FROM volunteer WHERE ev_id = :ev_id1"
     g.conn.execute(text(cmd), ev_id1 = ev_id)
     cmd = "DELETE FROM hold WHERE ev_id = :ev_id1"
