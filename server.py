@@ -43,13 +43,36 @@ def teardown_request(execption):
   except Exception as e:
     pass
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
   if session:
+    form = SearchForm(request.form)
     context = dict(loggedIn=session)
+    context['form'] = form
+    if request.method == 'POST':
+        return search_results(form)
     return render_template("index.html", **context)
   else:
     return redirect('/login/')
+
+@app.route('/search/')
+def search_results(searchForm):
+  # form = SearchForm(request.form)
+  results = {}
+  search_text = searchForm.searchText.data
+  cmd = ''
+  if searchForm.searchText.data == '':
+      cmd = "SELECT * FROM event"
+  cmd = "SELECT DISTINCT e.ev_id, e.ev_name, e.day_start, e.day_end FROM event e INNER JOIN cover c ON (e.ev_id=c.ev_id) INNER JOIN keyword k ON (c.top_id=k.top_id) WHERE LOWER(k.top_name) LIKE LOWER(\'%" + search_text + "%\')"
+  cursor = g.conn.execute(text(cmd))
+  for res in cursor:
+    results[res['ev_id']] = {'ev_name':res['ev_name'], 'day_start':res['day_start'], 'day_end':res['day_end']}
+  # if not results:
+  #     # flash('No results found!')
+  #     return redirect('/')
+  context = dict(results=results, search_text=search_text, form=searchForm)
+  return render_template('search_results.html', **context)
+
 
 @app.route('/student_groups')
 def student_groups():

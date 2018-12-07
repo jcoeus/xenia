@@ -23,3 +23,6 @@ class LogInForm(Form):
 			self.password.errors.append('Invalid Password')
 			return False
 		return True
+
+class SearchForm(Form):
+	searchText = StringField('')
