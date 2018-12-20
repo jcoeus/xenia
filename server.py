@@ -163,6 +163,26 @@ def new_ev():
   else:
     return redirect('/login/')
 
+@app.route('/geo_map')
+def geo_map():
+  return render_template("geo-map.html")
+
+@app.route('/tm_ga')
+def tm_ga():
+  return render_template("tm-ga.html")
+
+@app.route('/monthly_pie_chart')
+def month_pie():
+  return render_template("monthly-piechart.html")
+
+@app.route('/day_event_count')
+def day_event_count():
+  return render_template("event_label_count.html")
+
+@app.route('/event_label_map')
+def event_label_map():
+  return render_template("event_label_map.html")
+
 @app.route('/events/~<ev_id>')
 def event_page(ev_id):
   if session:
